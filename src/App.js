@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import axios from 'axios';
+
+import Form from './components/Form';
+import Recipes from './components/Recipes';
 import './App.css';
 
-function App() {
+const API_KEY = process.env.REACT_APP_APIKEY;
+
+const App = () => {
+  const [input, setInput] = useState('');
+  const [recipes, setRecipes] = useState([]);
+
+  const handleChange = e => {
+    setInput(e.target.value);
+  };
+
+  const getRecipe = async e => {
+    e.preventDefault();
+
+    const res = await axios.get(
+      `https://www.food2fork.com/api/search?key=${API_KEY}&q=${input}&count=10`,
+    );
+    setRecipes(res.data.recipes);
+    setInput('');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <div className='App'>
+      <header className='App-header'>
+        <h1 className='App-title'>Recipe Search</h1>
       </header>
+      <Form getRecipe={getRecipe} value={input} handleChange={handleChange} />
+      <Recipes recipes={recipes} />
     </div>
   );
-}
+};
 
 export default App;
